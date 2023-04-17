@@ -23,6 +23,8 @@ public:
 private slots:
     void on_pushButton_clicked();
 
+    void on_start_btn_clicked();
+
 private:
     Ui::ThirDialog *ui;
     SecDialog *secDialog;

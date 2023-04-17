@@ -4,12 +4,19 @@
 
 #include<QTimer>
 #include<QDateTime>
-
+#include<QPixmap>
 SecDialog::SecDialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::SecDialog)
 {
     ui->setupUi(this);
+
+    //QPixmap pix5("D:/KY 2 - NAM 3/QT CREATOR/TEST_DOAN2.jpg");
+    QPixmap pix5("D:/KY 2 - NAM 3/QT CREATOR/TEST_DOAN2/RICLAB.jpg");
+    int w5=ui->Logo_RIC->width();
+    int h5=ui->Logo_RIC->height();
+    ui->Logo_RIC->setPixmap(pix5.scaled(w5,h5,Qt::KeepAspectRatio));
+
     QTimer *timercl= new QTimer(this);
     connect(timercl,SIGNAL(timeout()),this,SLOT(showTime()));
     timercl->start();
@@ -52,6 +59,18 @@ SecDialog::SecDialog(QWidget *parent) :
     ui->plot_saiso->yAxis->setRange(0, 550);
     ui->plot_saiso->replot();
 
+    ui->plot_dieukhien->setAutoAddPlottableToLegend(false);
+    ui->plot_dieukhien->xAxis->setLabel("Time");
+    ui->plot_dieukhien->yAxis->setLabel("Value");
+    ui->plot_dieukhien->addGraph();
+    ui->plot_dieukhien->graph(0)->setName("SaiSo");
+    ui->plot_dieukhien->graph(0)->setPen(QPen(Qt::red));
+    ui->plot_dieukhien->graph(0)->setLineStyle(QCPGraph::lsLine);
+    ui->plot_dieukhien->graph(0)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCrossCircle, 5));
+    ui->plot_dieukhien->xAxis->setRange(0, PLOT_RANGE, Qt::AlignLeft);
+    ui->plot_dieukhien->yAxis->setRange(0, 550);
+    ui->plot_dieukhien->replot();
+
     serialPort.write("d");
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(timerTick()));
@@ -67,7 +86,8 @@ void SecDialog::showTime()
 {
     QTime timeclk = QTime::currentTime();
     QString time_text=timeclk.toString("hh : mm : ss");
-    ui->digital_clock->setText(time_text);
+    //ui->digital_clock->setText(time_text);
+    ui->temp_lcdNumber->display(time_text);
 }
 SecDialog::~SecDialog()
 {
@@ -111,8 +131,10 @@ void SecDialog::receiveMessage()
               {
                  ui->plot_dapung->graph(0)->addData(time, value1);
                  ui->plot_dapung->replot();
-                 ui->plot_saiso->graph(0)->addData(time, value2);
+                 ui->plot_saiso->graph(0)->addData(time, abs(giatridat-value1));
                  ui->plot_saiso->replot();
+                 ui->plot_dieukhien->graph(0)->addData(time, value2);
+                 ui->plot_dieukhien->replot();
                  if(time==PLOT_RANGE)
                  {
                      serialPort.write("d");
@@ -206,6 +228,18 @@ void SecDialog::on_reset_btn_clicked()
     ui->plot_saiso->yAxis->setRange(0, 550);
     ui->plot_saiso->replot();
 
+    ui->plot_dieukhien->setAutoAddPlottableToLegend(false);
+    ui->plot_dieukhien->xAxis->setLabel("Time");
+    ui->plot_dieukhien->yAxis->setLabel("Value");
+    ui->plot_dieukhien->addGraph();
+    ui->plot_dieukhien->graph(0)->setName("SaiSo");
+    ui->plot_dieukhien->graph(0)->setPen(QPen(Qt::red));
+    ui->plot_dieukhien->graph(0)->setLineStyle(QCPGraph::lsLine);
+    ui->plot_dieukhien->graph(0)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCrossCircle, 5));
+    ui->plot_dieukhien->xAxis->setRange(0, PLOT_RANGE, Qt::AlignLeft);
+    ui->plot_dieukhien->yAxis->setRange(0, 550);
+    ui->plot_dieukhien->replot();
+
     serialPort.write("d");
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(timerTick()));
@@ -222,5 +256,7 @@ void SecDialog::clearData()
     ui->plot_dapung->replot();
     ui->plot_saiso->clearPlottables();
     ui->plot_saiso->replot();
+    ui->plot_dieukhien->clearPlottables();
+    ui->plot_dieukhien->replot();
 }
 

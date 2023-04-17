@@ -46,10 +46,6 @@ ThirDialog::ThirDialog(QWidget *parent) :
     ui->comboBox_6->addItem("Hardware Flow Control");
     ui->comboBox_6->addItem("Software Flow Control");
 
-
-
-
-
 }
 
 ThirDialog::~ThirDialog()
@@ -60,30 +56,26 @@ ThirDialog::~ThirDialog()
 
 
 void ThirDialog::on_pushButton_clicked()
-{
-
-    secDialog= new SecDialog(this);
-    secDialog->show();
+{  
 
     QString portName = ui->comboBox->currentText();
     serialPort.setPortName(portName);
-    serialPort.open(QIODevice::ReadWrite);
 
     QString stringbaudRate = ui->comboBox_2->currentText();
     int intbaudRate = stringbaudRate.toInt();
     serialPort.setBaudRate(intbaudRate);
 
     QString dataBits = ui->comboBox_3->currentText();
-    if(dataBits == "5 Bits") {
+    if(dataBits == "5") {
        serialPort.setDataBits(QSerialPort::Data5);
     }
-    else if((dataBits == "6 Bits")) {
+    else if((dataBits == "6")) {
        serialPort.setDataBits(QSerialPort::Data6);
     }
-    else if(dataBits == "7 Bits") {
+    else if(dataBits == "7") {
        serialPort.setDataBits(QSerialPort::Data7);
     }
-    else if(dataBits == "8 Bits"){
+    else if(dataBits == "8"){
        serialPort.setDataBits(QSerialPort::Data8);
     }
 
@@ -115,7 +107,6 @@ void ThirDialog::on_pushButton_clicked()
         serialPort.setParity(QSerialPort::SpaceParity);
     }
 
-
     QString flowControl = ui->comboBox_6->currentText();
     if(flowControl == "No Flow Control") {
       serialPort.setFlowControl(QSerialPort::NoFlowControl);
@@ -126,6 +117,29 @@ void ThirDialog::on_pushButton_clicked()
     else if(flowControl == "Software Flow Control") {
       serialPort.setFlowControl(QSerialPort::SoftwareControl);
     }
-    //hide();
+    //serialPort.open(QIODevice::ReadWrite);
+
+
+    /*if (serialPort.open(QIODevice::ReadWrite))
+    {
+        qDebug() << "Serial port is open!";
+        secDialog= new SecDialog(this);
+        secDialog->show();
+
+    }else
+    {
+        //QMessageBox::warning(this, "Error", "Cannot open the selected port.");
+        qDebug() << "Cannot open the selected port.";
+    }
+    */
+
+}
+
+
+void ThirDialog::on_start_btn_clicked()
+{
+    secDialog= new SecDialog(this);
+    secDialog->show();
+    hide();
 }
 
