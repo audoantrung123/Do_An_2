@@ -40,6 +40,8 @@ private slots:
 
     void clearData();
 
+
+
 private:
     Ui::SecDialog *ui; 
     QCustomPlot *graph;

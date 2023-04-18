@@ -162,7 +162,8 @@ void SecDialog::on_send_btn_clicked()
     float Kd    = ui->KdLineEdit->text().toFloat();
     float Ki    = ui->KiLineEdit->text().toFloat();
     float Ag    = ui->AngleLineEdit->text().toFloat();
-    float load  = ui->load_slider->value();
+    float load  = ui->checkBox->isChecked();
+    //float load  = ui->load_slider->value();
     // Gửi chuỗi chứa giá trị Kp, Kd, Ki qua USART
     QString data = QString("Kp:%1,Kd:%2,Ki:%3,Ag:%4,Load:%5").arg(Kp).arg(Kd).arg(Ki).arg(Ag).arg(load);
     QByteArray byteArray = data.toUtf8();
@@ -259,4 +260,7 @@ void SecDialog::clearData()
     ui->plot_dieukhien->clearPlottables();
     ui->plot_dieukhien->replot();
 }
+
+
+
 
