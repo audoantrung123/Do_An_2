@@ -59,16 +59,32 @@ p, li { white-space: pre-wrap; }
    </property>
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
-     <widget class="QLineEdit" name="KpLineEdit"/>
+     <widget class="QLineEdit" name="KpLineEdit">
+      <property name="text">
+       <string>14</string>
+      </property>
+     </widget>
     </item>
     <item>
-     <widget class="QLineEdit" name="KiLineEdit"/>
+     <widget class="QLineEdit" name="KiLineEdit">
+      <property name="text">
+       <string>0.0143</string>
+      </property>
+     </widget>
     </item>
     <item>
-     <widget class="QLineEdit" name="KdLineEdit"/>
+     <widget class="QLineEdit" name="KdLineEdit">
+      <property name="text">
+       <string>10</string>
+      </property>
+     </widget>
     </item>
     <item>
-     <widget class="QLineEdit" name="AngleLineEdit"/>
+     <widget class="QLineEdit" name="AngleLineEdit">
+      <property name="text">
+       <string>5000</string>
+      </property>
+     </widget>
     </item>
     <item>
      <widget class="QPushButton" name="send_btn">

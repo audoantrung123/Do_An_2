@@ -26,7 +26,7 @@ SecDialog::SecDialog(QWidget *parent) :
     code2 = "%" ;
     codeSize = code.length();
 
-    serialPort.setPortName("COM7");
+    serialPort.setPortName("COM4");
     serialPort.setBaudRate(QSerialPort::Baud115200);
     serialPort.setDataBits(QSerialPort::Data8);
     serialPort.setParity(QSerialPort::NoParity);
@@ -42,7 +42,8 @@ SecDialog::SecDialog(QWidget *parent) :
     ui->plot_dapung->graph(0)->setName("Data");
     ui->plot_dapung->graph(0)->setPen(QPen(Qt::red));
     ui->plot_dapung->graph(0)->setLineStyle(QCPGraph::lsLine);
-    ui->plot_dapung->graph(0)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCrossCircle, 5));
+    //ui->plot_dieukhien->graph(0)->setAdaptiveSampling(true);
+    ui->plot_dapung->graph(0)->setScatterStyle(QCPScatterStyle::ssNone);
     ui->plot_dapung->xAxis->setRange(0, PLOT_RANGE, Qt::AlignLeft);
     ui->plot_dapung->yAxis->setRange(0, 550);
     ui->plot_dapung->replot();
@@ -71,7 +72,7 @@ SecDialog::SecDialog(QWidget *parent) :
     ui->plot_dieukhien->yAxis->setRange(0, 550);
     ui->plot_dieukhien->replot();
 
-    serialPort.write("d");
+    serialPort.write("o");
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(timerTick()));
     timer->start(TIME_BETWEEN_FRAMES_MS);
@@ -131,13 +132,19 @@ void SecDialog::receiveMessage()
               {
                  ui->plot_dapung->graph(0)->addData(time, value1);
                  ui->plot_dapung->replot();
-                 ui->plot_saiso->graph(0)->addData(time, abs(giatridat-value1));
+                 ui->plot_saiso->graph(0)->addData(time, abs(ui->AngleLineEdit->text().toFloat()-value1));
                  ui->plot_saiso->replot();
                  ui->plot_dieukhien->graph(0)->addData(time, value2);
                  ui->plot_dieukhien->replot();
                  if(time==PLOT_RANGE)
                  {
-                     serialPort.write("d");
+                     serialPort.write("o");
+                     serialPort.write("o");
+                     serialPort.write("o");
+                     serialPort.write("o");
+                     serialPort.write("o");
+                     serialPort.write("o");
+                     serialPort.write("o");
                      isRealTimeEnabled = false;
 
                  }else
@@ -167,7 +174,10 @@ void SecDialog::on_send_btn_clicked()
     // Gửi chuỗi chứa giá trị Kp, Kd, Ki qua USART
     QString data = QString("Kp:%1,Kd:%2,Ki:%3,Ag:%4,Load:%5").arg(Kp).arg(Kd).arg(Ki).arg(Ag).arg(load);
     QByteArray byteArray = data.toUtf8();
-    serialPort.write(byteArray);
+    for(int i=0;i<10;i++)
+    {
+        serialPort.write(byteArray);
+    }
 }
 
 
@@ -175,14 +185,17 @@ void SecDialog::on_start_btn_clicked()
 {
     isRealTimeEnabled = true;
     //timer->start(TIME_BETWEEN_FRAMES_MS);
-    serialPort.write("o");
+    serialPort.write("s");
 }
 
 
 void SecDialog::on_stop_btn_clicked()
 {
     isRealTimeEnabled = false;
-    serialPort.write("d");
+    for(int i=0;i<10;i++)
+    {
+        serialPort.write("o");
+    }
 }
 
 
@@ -197,7 +210,7 @@ void SecDialog::on_reset_btn_clicked()
     code2 = "%" ;
     codeSize = code.length();
 
-    serialPort.setPortName("COM7");
+    serialPort.setPortName("COM4");
     serialPort.setBaudRate(QSerialPort::Baud115200);
     serialPort.setDataBits(QSerialPort::Data8);
     serialPort.setParity(QSerialPort::NoParity);
@@ -212,9 +225,11 @@ void SecDialog::on_reset_btn_clicked()
     ui->plot_dapung->graph(0)->setName("Data");
     ui->plot_dapung->graph(0)->setPen(QPen(Qt::red));
     ui->plot_dapung->graph(0)->setLineStyle(QCPGraph::lsLine);
-    ui->plot_dapung->graph(0)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCrossCircle, 5));
+    //ui->plot_dapung->graph(0)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCrossCircle, 5));
+    //ui->plot_dieukhien->graph(0)->setAdaptiveSampling(true);
+    ui->plot_dapung->graph(0)->setScatterStyle(QCPScatterStyle::ssNone);
     ui->plot_dapung->xAxis->setRange(0, PLOT_RANGE, Qt::AlignLeft);
-    ui->plot_dapung->yAxis->setRange(0, 550);
+    ui->plot_dapung->yAxis->setRange(0, ui->AngleLineEdit->text().toFloat()+500);
     ui->plot_dapung->replot();
 
     ui->plot_saiso->setAutoAddPlottableToLegend(false);
@@ -224,9 +239,11 @@ void SecDialog::on_reset_btn_clicked()
     ui->plot_saiso->graph(0)->setName("SaiSo");
     ui->plot_saiso->graph(0)->setPen(QPen(Qt::red));
     ui->plot_saiso->graph(0)->setLineStyle(QCPGraph::lsLine);
-    ui->plot_saiso->graph(0)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCrossCircle, 5));
+    //ui->plot_saiso->graph(0)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCrossCircle, 5));
+    //ui->plot_dieukhien->graph(0)->setAdaptiveSampling(true);
+    ui->plot_dapung->graph(0)->setScatterStyle(QCPScatterStyle::ssNone);
     ui->plot_saiso->xAxis->setRange(0, PLOT_RANGE, Qt::AlignLeft);
-    ui->plot_saiso->yAxis->setRange(0, 550);
+    ui->plot_saiso->yAxis->setRange(0, ui->AngleLineEdit->text().toFloat()+500);
     ui->plot_saiso->replot();
 
     ui->plot_dieukhien->setAutoAddPlottableToLegend(false);
@@ -236,12 +253,19 @@ void SecDialog::on_reset_btn_clicked()
     ui->plot_dieukhien->graph(0)->setName("SaiSo");
     ui->plot_dieukhien->graph(0)->setPen(QPen(Qt::red));
     ui->plot_dieukhien->graph(0)->setLineStyle(QCPGraph::lsLine);
-    ui->plot_dieukhien->graph(0)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCrossCircle, 5));
+    //ui->plot_dieukhien->graph(0)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCrossCircle, 5));
+    //ui->plot_dieukhien->graph(0)->setAdaptiveSampling(true);
+    ui->plot_dapung->graph(0)->setScatterStyle(QCPScatterStyle::ssNone);
     ui->plot_dieukhien->xAxis->setRange(0, PLOT_RANGE, Qt::AlignLeft);
     ui->plot_dieukhien->yAxis->setRange(0, 550);
     ui->plot_dieukhien->replot();
 
-    serialPort.write("d");
+    serialPort.write("o");
+    serialPort.write("o");
+    serialPort.write("o");
+    serialPort.write("o");
+    serialPort.write("o");
+    serialPort.write("o");
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(timerTick()));
     timer->start(TIME_BETWEEN_FRAMES_MS);
