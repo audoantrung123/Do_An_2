@@ -4,6 +4,7 @@
 
 #include<QTimer>
 #include<QDateTime>
+#include <QElapsedTimer>
 #include<QPixmap>
 SecDialog::SecDialog(QWidget *parent) :
     QDialog(parent),
@@ -26,7 +27,7 @@ SecDialog::SecDialog(QWidget *parent) :
     code2 = "%" ;
     codeSize = code.length();
 
-    serialPort.setPortName("COM4");
+    serialPort.setPortName("COM7");
     serialPort.setBaudRate(QSerialPort::Baud115200);
     serialPort.setDataBits(QSerialPort::Data8);
     serialPort.setParity(QSerialPort::NoParity);
@@ -77,9 +78,6 @@ SecDialog::SecDialog(QWidget *parent) :
     connect(timer, SIGNAL(timeout()), this, SLOT(timerTick()));
     timer->start(TIME_BETWEEN_FRAMES_MS);
 
-    // Khởi tạo biến startTime là thời gian bắt đầu hiển thị đồ thị (lấy ra giá trị hiện tại và trừ đi DISPLAY_TIME)
-
-
     connect(&serialPort, SIGNAL(readyRead()), this, SLOT(receiveMessage()));
 
 }
@@ -102,7 +100,7 @@ void SecDialog::receiveMessage()
     buffer.append(data);
     int index = buffer.indexOf(code);
     //int index2= buffer.indexOf(code2);
-
+    time = timer2.elapsed();
     if (index != -1)
     {
         QString message = buffer.mid(0, index);
@@ -128,15 +126,15 @@ void SecDialog::receiveMessage()
              // Add the received data to the plot
             //static double time = 0.0; // Initialize time variable
 
-              if (time <= PLOT_RANGE)
+              if ((float)time/1000 <= PLOT_RANGE)
               {
-                 ui->plot_dapung->graph(0)->addData(time, value1);
+                 ui->plot_dapung->graph(0)->addData((float)time/1000, value1);
                  ui->plot_dapung->replot();
-                 ui->plot_saiso->graph(0)->addData(time, abs(ui->AngleLineEdit->text().toFloat()-value1));
+                 ui->plot_saiso->graph(0)->addData((float)time/1000, abs(ui->AngleLineEdit->text().toFloat()-value1));
                  ui->plot_saiso->replot();
-                 ui->plot_dieukhien->graph(0)->addData(time, value2);
+                 ui->plot_dieukhien->graph(0)->addData((float)time/1000, value2);
                  ui->plot_dieukhien->replot();
-                 if(time==PLOT_RANGE)
+                 if((float)time/1000==PLOT_RANGE)
                  {
                      serialPort.write("o");
                      serialPort.write("o");
@@ -147,13 +145,14 @@ void SecDialog::receiveMessage()
                      serialPort.write("o");
                      isRealTimeEnabled = false;
 
-                 }else
-                 {
-                     time += 0.1; // Increase time variable by 0.1 second for each data point
                  }
+
               }
+              qDebug() << "Elapsed time: " << time << "milliseconds";
         }
+
   }
+
 }
 
 void SecDialog::on_load_slider_valueChanged(int value)
@@ -184,6 +183,7 @@ void SecDialog::on_send_btn_clicked()
 void SecDialog::on_start_btn_clicked()
 {
     isRealTimeEnabled = true;
+    timer2.start();
     //timer->start(TIME_BETWEEN_FRAMES_MS);
     serialPort.write("s");
 }
@@ -210,7 +210,7 @@ void SecDialog::on_reset_btn_clicked()
     code2 = "%" ;
     codeSize = code.length();
 
-    serialPort.setPortName("COM4");
+    serialPort.setPortName("COM7");
     serialPort.setBaudRate(QSerialPort::Baud115200);
     serialPort.setDataBits(QSerialPort::Data8);
     serialPort.setParity(QSerialPort::NoParity);
@@ -218,6 +218,8 @@ void SecDialog::on_reset_btn_clicked()
     serialPort.setFlowControl(QSerialPort::NoFlowControl);
     serialPort.open(QIODevice::ReadWrite);
 
+    time = 0;
+    timer2.restart();
     ui->plot_dapung->setAutoAddPlottableToLegend(false);
     ui->plot_dapung->xAxis->setLabel("Time");
     ui->plot_dapung->yAxis->setLabel("Value");

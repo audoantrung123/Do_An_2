@@ -8,7 +8,7 @@
 #include <QSerialPortInfo>
 #include  "qcustomplot.h"
 
-#define TIME_BETWEEN_FRAMES_MS  100
+#define TIME_BETWEEN_FRAMES_MS  20
 #define PLOT_RANGE 4
 
 namespace Ui {
@@ -51,9 +51,10 @@ private:
     QString code;
     QString code2;
     QTimer *timer;
+    QElapsedTimer timer2;
+    qint64 time = 0;
     int codeSize;
     bool isRealTimeEnabled = false;
-    double time = 0.0;
     //int giatridat=100;
 
 };
