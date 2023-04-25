@@ -8,8 +8,8 @@
 #include <QSerialPortInfo>
 #include  "qcustomplot.h"
 
-#define TIME_BETWEEN_FRAMES_MS  100
-#define PLOT_RANGE 4
+#define TIME_BETWEEN_FRAMES_MS  10
+#define PLOT_RANGE 6
 
 namespace Ui {
 class SecDialog;
@@ -26,7 +26,7 @@ public:
 private slots:
     void receiveMessage();
 
-    void showTime();
+    //void showTime();
 
     void on_load_slider_valueChanged(int value);
 
@@ -51,9 +51,11 @@ private:
     QString code;
     QString code2;
     QTimer *timer;
+    QElapsedTimer timer2;
+    int time = 0;
     int codeSize;
     bool isRealTimeEnabled = false;
-    double time = 0.0;
+    bool isStart= false;
     //int giatridat=100;
 
 };
