@@ -27,8 +27,8 @@ SecDialog::SecDialog(QWidget *parent) :
     code2 = "%" ;
     codeSize = code.length();
 
-    serialPort.setPortName("COM13");
-    serialPort.setBaudRate(QSerialPort::Baud115200);
+    serialPort.setPortName("COM4");
+    serialPort.setBaudRate(QSerialPort::Baud9600);
     serialPort.setDataBits(QSerialPort::Data8);
     serialPort.setParity(QSerialPort::NoParity);
     serialPort.setStopBits(QSerialPort::OneStop);
@@ -173,13 +173,19 @@ void SecDialog::on_load_slider_valueChanged(int value)
 void SecDialog::on_send_btn_clicked()
 {
     // Lấy giá trị từ các edit text
+    float load;
     float Kp    = ui->KpLineEdit->text().toFloat();
     float Kd    = ui->KdLineEdit->text().toFloat();
     float Ki    = ui->KiLineEdit->text().toFloat();
     float Ag    = ui->AngleLineEdit->text().toFloat();
-    float load  = ui->checkBox->isChecked();
+    if (ui->checkBox->isChecked()) {
+        load = 1;
+    } else {
+        load = 0;
+    }
+    // load  = ui->checkBox->isChecked();
     // Gửi chuỗi chứa giá trị Kp, Kd, Ki qua USART
-    QString data = QString("Kp:%1,Kd:%2,Ki:%3,Ag:%4,Load:%5").arg(Kp).arg(Kd).arg(Ki).arg(Ag).arg(load);
+    QString data = QString("Kp:%1,Kd:%2,Ki:%3,Ag:%4,Re:%5").arg(Kp).arg(Kd).arg(Ki).arg(Ag).arg(load);
     QByteArray byteArray = data.toUtf8();
     for(int i=0;i<10;i++)
     {

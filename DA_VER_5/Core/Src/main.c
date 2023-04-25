@@ -40,7 +40,7 @@ char buffer[BUFFER_SIZE];
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
-
+TIM_HandleTypeDef htim3;
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
@@ -64,8 +64,10 @@ static void MX_TIM1_Init(void);
 static void MX_TIM4_Init(void);
 static void MX_USART1_UART_Init(void);
 static void MX_TIM2_Init(void);
+
 /* USER CODE BEGIN PFP */
 static void Motor_Control(int32_t motorSpeed);
+static void MX_TIM3_Init(void);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -122,6 +124,7 @@ int main(void)
   MX_TIM4_Init();
   MX_USART1_UART_Init();
   MX_TIM2_Init();
+  MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
   HD44780_Init(2);
   HD44780_Clear();
@@ -130,6 +133,7 @@ int main(void)
 	char str[6];
   HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_1);
   HAL_TIM_Encoder_Start_IT(&htim2, TIM_CHANNEL_ALL);
+  HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_3);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -177,11 +181,13 @@ while (!running) {
 		{
 		  KD = atof(strtok(NULL, ":,"));
 		}
-		else if (strcmp(pch, "Ki") == 0)
+		else
+		if (strcmp(pch, "Ki") == 0)
 		{
 		  KI = atof(strtok(NULL, ":,"));
 		}
-		else if (strcmp(pch, "Ag") == 0)
+		else
+			if (strcmp(pch, "Ag") == 0)
 		{
 		  Setpoint = atof(strtok(NULL, ":,"));
 		}
@@ -200,7 +206,11 @@ while (!running) {
 		//HAL_TIM_Encoder_Start_IT(&htim2, TIM_CHANNEL_ALL);
 //		__HAL_TIM_SetCounter(&htim2,0);
 //		if (counter == 0) lastPosition = 0;
-
+		if (Load) {
+			htim3.Instance->CCR3 = 1750;
+		} else {
+			htim3.Instance->CCR3 = 2500;
+		}
 		Motor_Control(0);
 
 		//##################### I2C LCD SHOW ##########################//
@@ -210,10 +220,10 @@ while (!running) {
 				HD44780_PrintStr(str);
 
 
-		  		sprintf(str, "%ld", (uint32_t)running);
+		  		sprintf(str, "%ld", (uint32_t)Load);
 		  				  		HD44780_SetCursor(8,1);
 		  				  		HD44780_PrintStr(str);
-		  	    sprintf(str, "%ld", (uint32_t)(KD));
+		  	    sprintf(str, "%ld", (uint32_t)(KP));
 					HD44780_SetCursor(0,1);
 					HD44780_PrintStr(str);
 
@@ -273,7 +283,7 @@ while (running) {
 
 		  //##################### I2C LCD SHOW ##########################//
 		  HD44780_Clear();
-		  		sprintf(str, "%ld", (uint32_t)Setpoint);
+		  		sprintf(str, "%ld", (uint32_t)speed);
 		  		HD44780_SetCursor(10,1);
 		  		HD44780_PrintStr(str);
 
@@ -585,7 +595,7 @@ static void MX_USART1_UART_Init(void)
 
   /* USER CODE END USART1_Init 1 */
   huart1.Instance = USART1;
-  huart1.Init.BaudRate = 115200;
+  huart1.Init.BaudRate = 9600;
   huart1.Init.WordLength = UART_WORDLENGTH_8B;
   huart1.Init.StopBits = UART_STOPBITS_1;
   huart1.Init.Parity = UART_PARITY_NONE;
@@ -669,6 +679,50 @@ static void Motor_Control(int32_t motorSpeed){
 	    HAL_GPIO_WritePin(GPIOD, GPIO_PIN_10, 0);
 	}
     __HAL_TIM_SET_COMPARE(&htim4,TIM_CHANNEL_1,motorSpeed);
+}
+
+static void MX_TIM3_Init(void)
+{
+
+  /* USER CODE BEGIN TIM3_Init 0 */
+
+  /* USER CODE END TIM3_Init 0 */
+
+  TIM_MasterConfigTypeDef sMasterConfig = {0};
+  TIM_OC_InitTypeDef sConfigOC = {0};
+
+  /* USER CODE BEGIN TIM3_Init 1 */
+
+  /* USER CODE END TIM3_Init 1 */
+  htim3.Instance = TIM3;
+  htim3.Init.Prescaler = 83;
+  htim3.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim3.Init.Period = 20000;
+  htim3.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  htim3.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  if (HAL_TIM_PWM_Init(&htim3) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+  if (HAL_TIMEx_MasterConfigSynchronization(&htim3, &sMasterConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sConfigOC.OCMode = TIM_OCMODE_PWM1;
+  sConfigOC.Pulse = 0;
+  sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
+  sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
+  if (HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_3) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN TIM3_Init 2 */
+
+  /* USER CODE END TIM3_Init 2 */
+  HAL_TIM_MspPostInit(&htim3);
+
 }
 /* USER CODE END 4 */
 
