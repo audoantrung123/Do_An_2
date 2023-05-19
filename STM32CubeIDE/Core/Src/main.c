@@ -143,6 +143,7 @@ int main(void)
   KI = 0.0143;
   KD = 10;
   Setpoint = 3600;
+  uint16_t ReSetpoint = 0;
 
   // 1100 14 0.02 10
   Kp = KP/100;
@@ -189,7 +190,8 @@ while (!running) {
 		else
 			if (strcmp(pch, "Ag") == 0)
 		{
-		  Setpoint = atof(strtok(NULL, ":,"));
+			ReSetpoint = atof(strtok(NULL, ":,"));
+			Setpoint = ReSetpoint;
 		}
 		else if (strcmp(pch, "Re") == 0)
 		{
@@ -214,18 +216,18 @@ while (!running) {
 		Motor_Control(0);
 
 		//##################### I2C LCD SHOW ##########################//
-		HD44780_Clear();
-				sprintf(str, "%ld", (uint32_t)Setpoint);
-				HD44780_SetCursor(10,1);
-				HD44780_PrintStr(str);
+			HD44780_Clear();
+			sprintf(str, "%ld", (uint32_t)Setpoint);
+			HD44780_SetCursor(10,1);
+			HD44780_PrintStr(str);
 
 
-		  		sprintf(str, "%ld", (uint32_t)Load);
-		  				  		HD44780_SetCursor(8,1);
-		  				  		HD44780_PrintStr(str);
-		  	    sprintf(str, "%ld", (uint32_t)(KP));
-					HD44780_SetCursor(0,1);
-					HD44780_PrintStr(str);
+			sprintf(str, "%ld", (uint32_t)Load);
+			HD44780_SetCursor(8,1);
+			HD44780_PrintStr(str);
+			sprintf(str, "%ld", (uint32_t)(counter));
+			HD44780_SetCursor(0,1);
+			HD44780_PrintStr(str);
 
 		//##################### I2C LCD SHOW ##########################//
 
@@ -243,6 +245,10 @@ while (running) {
 
 		//if (counter < 25000) Position = counter; else Position = -(50000 - counter);
 		//if (Position < 0) Position = 0;
+
+	if (Position > 0.98*Setpoint) Setpoint = 0;
+	if (Position < (int)ReSetpoint*0.02 && Setpoint == 0) Setpoint = ReSetpoint;
+
 		Position = counter - lastPosition;
 		Input = Position;
 	    error = Setpoint - Input;

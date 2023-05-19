@@ -136,7 +136,7 @@ void SecDialog::receiveMessage()
         }
 
         // Convert the values to doubles
-        double value1 = values[0].toDouble();
+        double value1 = values[0].toDouble()/10;
         double value2 = values[1].toDouble();
 
         if(isRealTimeEnabled)
@@ -178,6 +178,7 @@ void SecDialog::on_send_btn_clicked()
     float Kd    = ui->KdLineEdit->text().toFloat();
     float Ki    = ui->KiLineEdit->text().toFloat();
     float Ag    = ui->AngleLineEdit->text().toFloat();
+    Ag = Ag*10;
     if (ui->checkBox->isChecked()) {
         load = 1;
     } else {
@@ -221,7 +222,7 @@ void SecDialog::on_reset_btn_clicked()
     ui->plot_dapung->graph(0)->setLineStyle(QCPGraph::lsLine);
     ui->plot_dapung->graph(0)->setScatterStyle(QCPScatterStyle::ssNone);
     ui->plot_dapung->xAxis->setRange(0, PLOT_RANGE, Qt::AlignLeft);
-    ui->plot_dapung->yAxis->setRange(0, ui->AngleLineEdit->text().toFloat()+500);
+    ui->plot_dapung->yAxis->setRange(0, ui->AngleLineEdit->text().toFloat()+100);
     ui->plot_dapung->replot();
 
     ui->plot_saiso->setAutoAddPlottableToLegend(false);
@@ -233,7 +234,7 @@ void SecDialog::on_reset_btn_clicked()
     ui->plot_saiso->graph(0)->setLineStyle(QCPGraph::lsLine);
     ui->plot_dapung->graph(0)->setScatterStyle(QCPScatterStyle::ssNone);
     ui->plot_saiso->xAxis->setRange(0, PLOT_RANGE, Qt::AlignLeft);
-    ui->plot_saiso->yAxis->setRange(0, ui->AngleLineEdit->text().toFloat()+500);
+    ui->plot_saiso->yAxis->setRange(0, ui->AngleLineEdit->text().toFloat()+100);
     ui->plot_saiso->replot();
 
     ui->plot_dieukhien->setAutoAddPlottableToLegend(false);
@@ -245,7 +246,7 @@ void SecDialog::on_reset_btn_clicked()
     ui->plot_dieukhien->graph(0)->setLineStyle(QCPGraph::lsLine);
     ui->plot_dapung->graph(0)->setScatterStyle(QCPScatterStyle::ssNone);
     ui->plot_dieukhien->xAxis->setRange(0, PLOT_RANGE, Qt::AlignLeft);
-    ui->plot_dieukhien->yAxis->setRange(0, 150);
+    ui->plot_dieukhien->yAxis->setRange(-150, 150);
     ui->plot_dieukhien->replot();
 
     for(int i=0;i<10;i++)

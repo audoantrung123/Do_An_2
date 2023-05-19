@@ -9,7 +9,7 @@
 #include  "qcustomplot.h"
 
 #define TIME_BETWEEN_FRAMES_MS  10
-#define PLOT_RANGE 6
+#define PLOT_RANGE 10
 
 namespace Ui {
 class SecDialog;
